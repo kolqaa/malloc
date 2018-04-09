@@ -1,17 +1,17 @@
 #include "../includes/malloc.h"
 #include <stdio.h>
+#include <unistd.h>
+#include <stdlib.h>
 
 struct ovrl_block *g_dma = NULL;
 
 static void init_tiny(void)
 {
-  printf("start addr %p\n", (struct t_block*)(g_dma + 1));
-  	g_dma->t = (struct t_block*)(g_dma + 1);
+  	g_dma->t = (struct t_block *)(g_dma + 1);
 
-	//	write(1, "init success1\n", 30);
-	//g_dma->addr = (struct block_addr*)(g_dma + 1);
-	//	g_dma->addr->t_s_addr = (char *)(g_dma + 1);
-	//g_dma->addr->t_e_addr = (char *)(g_dma + T_PAGE_SIZE + 1);
+	g_dma->addr = (struct block_addr*)(g_dma + 1);
+	g_dma->addr->t_s_addr = (char *)(g_dma + 1);
+	g_dma->addr->t_e_addr = (char *)(g_dma + T_PAGE_SIZE + 1);
 
   	g_dma->t->size = 0;
   	g_dma->t->inuse = 0;
@@ -40,14 +40,15 @@ static void init_large(void)
 
 void init_memory(void)
 {
+	const size_t SIZE = (sizeof(struct ovrl_block) + T_PAGE_SIZE + S_PAGE_SIZE) * 200;
   	if (!g_dma)
 	{
-	  g_dma = mmap(NULL, sizeof(struct ovrl_block)
-		       + (T_PAGE_SIZE * 100)
-		       + (S_PAGE_SIZE * 100),
-		       PROT_READ | PROT_WRITE, MAP_ANON, -1, 0);
-	  
-	    init_tiny();
+		if ((g_dma = mmap(NULL, SIZE,
+						  PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, -1, 0)) == MAP_FAILED)
+		{
+			exit(0);
+		}
+		init_tiny();
 	    //init_small();
 	  }
 	  //init_large();
