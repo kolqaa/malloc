@@ -6,18 +6,7 @@
 struct ovrl_block *g_dma = NULL;
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
-enum CHUNK_TYPE {TINY, SMALL};
 
-
-
-#define ADD_CHUNK_TO_DMA(TYPE, TINY_NODE, TMP) ({\
-    TMP = TINY_NODE->next; \
-    TINY_NODE->next = TINY_NODE->blck_limit; \
-    TINY_NODE->next->blck_limit = \
-    (struct t_block*)((char*)tiny_node->next + size); \
-    TINY_NODE->next->next = tmp; \
-    TINY_NODE->next->size = size; \
-})
 
 void *add_tiny(struct t_block *tiny_head, size_t size, size_t max)
 {

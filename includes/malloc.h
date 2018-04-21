@@ -20,6 +20,18 @@
 #define MMAP_FLAGS PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE
 #define OFFSET -1
 
+enum  CUNK_TYPE {TINY, SMALL};
+
+#define ADD_CHUNK_TO_DMA(TYPE, NODE, TMP_NODE) ({\
+    TMP_NODE = NODE->next; \
+    NODE->next = NODE->blck_limit; \
+    NODE->next->blck_limit = (TYPE == TINY) \
+        ? ((struct t_block*)((char*)NODE->next + size)) \
+        : ((struct s_block*)((char*)NODE->next + size)); \
+    NODE->next->next = TMP_NODE; \
+    NODE->next->size = size; \
+    NODE->next->inuse = 1; \
+})
 
 struct t_block
 {
