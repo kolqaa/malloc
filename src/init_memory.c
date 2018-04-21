@@ -5,49 +5,46 @@
 struct ovrl_block *g_dma = NULL;
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
-void *add_tiny(struct t_block *tiny_head, size_t size, size_t max)
+/**
+ * NOTICE:
+ * CALL THIS WITH LOCK MUTEX BECAUSE IT RELEASE IT AT THE END
+ */
+void *push_tiny_chunk(struct t_block *tiny_head, size_t size, size_t max)
 {
     struct  t_block *tiny_node;
     struct  t_block *tmp;
     size += sizeof(struct t_block);
 
     tiny_node = tiny_head;
-    while (tiny_node->next != NULL)
-    {
-        if ((char *)tiny_node->next - (char *)tiny_node->blck_limit >= size)
-	        break;
-        tiny_node = tiny_node->next;
-    }
+    FIND_FREED_BLOCK(tiny_node);
 
-    if ((char*)tiny_node->blck_limit + size > (char*)tiny_head + max)
-    {
-        errno = ENOMEM;
+    if (CHECK_MEM_OVERFLOW(tiny_node, tiny_head, size, max))
         return (NULL);
-    }
-    ADD_CHUNK_TO_DMA(TINY, tiny_node, tmp);
+
+    ADD_CHUNK_TO_DMA(TINY, tiny_node, tmp, (struct t_block*));
+    pthread_mutex_unlock(&mutex);
     return (tiny_node->next + 1);
 }
 
-void *add_small(struct t_block *small_head, size_t size, size_t max)
+
+/**
+ * NOTICE:
+ * CALL THIS WITH LOCK MUTEX BECAUSE IT RELEASE IT AT THE END
+ */
+void *push_small_chunk(struct s_block *small_head, size_t size, size_t max)
 {
-    struct  t_block *small_node;
-    struct  t_block *tmp;
+    struct  s_block *small_node;
+    struct  s_block *tmp;
     size += sizeof(struct t_block);
 
     small_node = small_head;
-    while (small_node->next != NULL)
-    {
-        if ((char *)small_node->next - (char *)small_node->blck_limit >= size)
-            break;
-        small_node = small_node->next;
-    }
+    FIND_FREED_BLOCK(small_node);
 
-    if ((char*)small_node->blck_limit + size > (char*)small_head + max)
-    {
-        errno = ENOMEM;
+    if (CHECK_MEM_OVERFLOW(small_node, small_head, size, max))
         return (NULL);
-    }
-    ADD_CHUNK_TO_DMA(SMALL, small_node, tmp);
+
+    ADD_CHUNK_TO_DMA(SMALL, small_node, tmp, (struct s_block*));
+    pthread_mutex_unlock(&mutex);
     return (small_node->next + 1);
 }
 
@@ -108,8 +105,10 @@ long print_malloc(struct t_block *node)
 void show_alloc_mem(void)
 {
     printf("TINY: %p\n", g_dma->tiny);
+    printf("TINY addr : %p\n", g_dma->addr.tiny_start);
     print_malloc(g_dma->tiny);
     printf("SMALL: %p\n", g_dma->small);
+    printf("SMALL addr: %p\n", g_dma->addr.small_start);
 }
 
 void init_memory(void)
@@ -124,8 +123,8 @@ void init_memory(void)
 
 	  	init_tiny();
 		init_small();
-		g_dma->get_tiny = add_tiny;
-        g_dma->get_small = add_small;
+		g_dma->get_tiny = push_tiny_chunk;
+        g_dma->get_small = push_small_chunk;
         //g_dma->get_large = add_large;
        // g_dma->get_small = get_small;
 	} 
@@ -143,6 +142,7 @@ void *mallok(size_t size)
         return (g_dma->get_tiny(g_dma->tiny, size, g_dma->tiny_limit));
     else if (size <= S_PAGE_SIZE)
         return (g_dma->get_small(g_dma->small, size, g_dma->small_limit));
+
 
     pthread_mutex_unlock(&mutex);
     return NULL;

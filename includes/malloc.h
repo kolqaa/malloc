@@ -22,16 +22,29 @@
 
 enum  CUNK_TYPE {TINY, SMALL};
 
-#define ADD_CHUNK_TO_DMA(TYPE, NODE, TMP_NODE) \
+#define ADD_CHUNK_TO_DMA(TYPE, NODE, TMP_NODE, CAST_TYPE) \
 ({\
     TMP_NODE = NODE->next; \
     NODE->next = NODE->blck_limit; \
-    NODE->next->blck_limit = (TYPE == TINY) \
-        ? ((struct t_block*)((char*)NODE->next + size)) \
-        : ((struct s_block*)((char*)NODE->next + size)); \
+    NODE->next->blck_limit = CAST_TYPE(char*)NODE->next + size; \
     NODE->next->next = TMP_NODE; \
     NODE->next->size = size; \
     NODE->next->inuse = 1; \
+})
+
+#define CHECK_MEM_OVERFLOW(NODE, HEAD, SIZE, MAX) \
+({\
+   ((char*)NODE->blck_limit + SIZE > (char*)HEAD + MAX) ? (1) : (0); \
+})
+
+#define FIND_FREED_BLOCK(NODE) \
+({\
+	while (NODE->next != NULL) \
+	{ \
+		if ((char *)NODE->next - (char *)NODE->blck_limit >= size) \
+			break; \
+		NODE = NODE->next;\
+	} \
 })
 
 struct t_block
