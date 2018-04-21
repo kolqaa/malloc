@@ -22,7 +22,8 @@
 
 enum  CUNK_TYPE {TINY, SMALL};
 
-#define ADD_CHUNK_TO_DMA(TYPE, NODE, TMP_NODE) ({\
+#define ADD_CHUNK_TO_DMA(TYPE, NODE, TMP_NODE) \
+({\
     TMP_NODE = NODE->next; \
     NODE->next = NODE->blck_limit; \
     NODE->next->blck_limit = (TYPE == TINY) \
@@ -87,8 +88,8 @@ struct ovrl_block
   	struct block_addr addr;
 
   	void *(*get_tiny)(struct t_block* , size_t, size_t);
-  //  	void *(get_small)(struct s_block* , size_t, size_t);
-  //void *(get_large)(struct l_block* , size_t, size_t);
+	void *(*get_small)(struct s_block* , size_t, size_t);
+  //void *(*get_large)(struct l_block* , size_t, size_t);
 };
 
 extern struct ovrl_block *g_dma;

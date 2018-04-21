@@ -1,12 +1,9 @@
 #include "../includes/malloc.h"
 #include <stdio.h>
-#include <unistd.h>
 #include <stdlib.h>
 
 struct ovrl_block *g_dma = NULL;
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-
-
 
 void *add_tiny(struct t_block *tiny_head, size_t size, size_t max)
 {
@@ -18,7 +15,7 @@ void *add_tiny(struct t_block *tiny_head, size_t size, size_t max)
     while (tiny_node->next != NULL)
     {
         if ((char *)tiny_node->next - (char *)tiny_node->blck_limit >= size)
-	    break;
+	        break;
         tiny_node = tiny_node->next;
     }
 
@@ -29,6 +26,29 @@ void *add_tiny(struct t_block *tiny_head, size_t size, size_t max)
     }
     ADD_CHUNK_TO_DMA(TINY, tiny_node, tmp);
     return (tiny_node->next + 1);
+}
+
+void *add_small(struct t_block *small_head, size_t size, size_t max)
+{
+    struct  t_block *small_node;
+    struct  t_block *tmp;
+    size += sizeof(struct t_block);
+
+    small_node = small_head;
+    while (small_node->next != NULL)
+    {
+        if ((char *)small_node->next - (char *)small_node->blck_limit >= size)
+            break;
+        small_node = small_node->next;
+    }
+
+    if ((char*)small_node->blck_limit + size > (char*)small_head + max)
+    {
+        errno = ENOMEM;
+        return (NULL);
+    }
+    ADD_CHUNK_TO_DMA(SMALL, small_node, tmp);
+    return (small_node->next + 1);
 }
 
 
@@ -92,14 +112,6 @@ void show_alloc_mem(void)
     printf("SMALL: %p\n", g_dma->small);
 }
 
-/*static void init_large(void)
-{
-  	g_dma->l = NULL;
-	g_dma->l->size = 0;
-	g_dma->l->inuse = 0;
-	g_dma->l->next = NULL;
-    }*/
-
 void init_memory(void)
 {
   	if (!g_dma)
@@ -109,9 +121,11 @@ void init_memory(void)
                               + PREALOC_SIZE_SMALL,
                               MMAP_FLAGS, OFFSET, 0)) == MAP_FAILED)
 	    	exit(0);
+
 	  	init_tiny();
 		init_small();
 		g_dma->get_tiny = add_tiny;
+        g_dma->get_small = add_small;
         //g_dma->get_large = add_large;
        // g_dma->get_small = get_small;
 	} 
@@ -127,10 +141,9 @@ void *mallok(size_t size)
 
     if (size <= T_PAGE_SIZE)
         return (g_dma->get_tiny(g_dma->tiny, size, g_dma->tiny_limit));
-  /*else if (size < S_LIMIT)
-    return (g_dma->get_small(g_dma->small, size, g_dma->small_limit));
-  else
-  return (g_dma->get_large(g_dma->large, size));*/
+    else if (size <= S_PAGE_SIZE)
+        return (g_dma->get_small(g_dma->small, size, g_dma->small_limit));
+
     pthread_mutex_unlock(&mutex);
     return NULL;
 }
