@@ -108,5 +108,12 @@ struct ovrl_block
 extern struct ovrl_block *g_dma;
 extern pthread_mutex_t mutex;
 
+void *mallok(size_t size);
 void init_memory(void);
+void *push_tiny_chunk(struct t_block *tiny_head, size_t size, size_t max);
+void *push_small_chunk(struct s_block *small_head, size_t size, size_t max);
+void show_alloc_mem(void);
+long print_malloc(struct t_block *node);
+long print_alloc(struct t_block *node);
+
 #endif

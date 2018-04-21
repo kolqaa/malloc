@@ -5,50 +5,6 @@
 struct ovrl_block *g_dma = NULL;
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
-/**
- * NOTICE:
- * CALL THIS WITH LOCK MUTEX BECAUSE IT RELEASE IT AT THE END
- */
-void *push_tiny_chunk(struct t_block *tiny_head, size_t size, size_t max)
-{
-    struct  t_block *tiny_node;
-    struct  t_block *tmp;
-    size += sizeof(struct t_block);
-
-    tiny_node = tiny_head;
-    FIND_FREED_BLOCK(tiny_node);
-
-    if (CHECK_MEM_OVERFLOW(tiny_node, tiny_head, size, max))
-        return (NULL);
-
-    ADD_CHUNK_TO_DMA(TINY, tiny_node, tmp, (struct t_block*));
-    pthread_mutex_unlock(&mutex);
-    return (tiny_node->next + 1);
-}
-
-
-/**
- * NOTICE:
- * CALL THIS WITH LOCK MUTEX BECAUSE IT RELEASE IT AT THE END
- */
-void *push_small_chunk(struct s_block *small_head, size_t size, size_t max)
-{
-    struct  s_block *small_node;
-    struct  s_block *tmp;
-    size += sizeof(struct t_block);
-
-    small_node = small_head;
-    FIND_FREED_BLOCK(small_node);
-
-    if (CHECK_MEM_OVERFLOW(small_node, small_head, size, max))
-        return (NULL);
-
-    ADD_CHUNK_TO_DMA(SMALL, small_node, tmp, (struct s_block*));
-    pthread_mutex_unlock(&mutex);
-    return (small_node->next + 1);
-}
-
-
 static void init_tiny(void)
 {
     g_dma->tiny = (struct t_block *)(g_dma + 1);
@@ -75,42 +31,6 @@ static void init_small(void)
     g_dma->addr.small_start = (char*)g_dma->small;
 }
 
-long print_alloc(struct t_block *node)
-{
-  long size;
-
-  printf("%lx", (long)(node + 1));
-  printf(" - ");
-  printf("%lx", (long)(node->blck_limit));
-  printf(" : ");
-  size = node->size;//(char*)node->blck_limit - (char*)node - sizeof(struct t_block);
-  printf("%ld ", size);
-  puts(" octets\n");
-  return (size);
-}
-
-long print_malloc(struct t_block *node)
-{
-  long total;
-
-  total = 0;
-  while (node->next != NULL)
-    {
-      node = node->next;
-      total += print_alloc(node);
-    }
-    return (total);
-}
-
-void show_alloc_mem(void)
-{
-    printf("TINY: %p\n", g_dma->tiny);
-    printf("TINY addr : %p\n", g_dma->addr.tiny_start);
-    print_malloc(g_dma->tiny);
-    printf("SMALL: %p\n", g_dma->small);
-    printf("SMALL addr: %p\n", g_dma->addr.small_start);
-}
-
 void init_memory(void)
 {
   	if (!g_dma)
@@ -129,23 +49,6 @@ void init_memory(void)
        // g_dma->get_small = get_small;
 	} 
 	  //init_large();
-}
-
-void *mallok(size_t size)
-{
-    pthread_mutex_lock(&mutex);
-
-    if (g_dma == NULL)
-        init_memory();
-
-    if (size <= T_PAGE_SIZE)
-        return (g_dma->get_tiny(g_dma->tiny, size, g_dma->tiny_limit));
-    else if (size <= S_PAGE_SIZE)
-        return (g_dma->get_small(g_dma->small, size, g_dma->small_limit));
-
-
-    pthread_mutex_unlock(&mutex);
-    return NULL;
 }
 
 int main(void)
