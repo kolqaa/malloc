@@ -12,9 +12,6 @@ static void init_tiny(void)
     g_dma->tiny_limit = (size_t)T_LIMIT;
 
     g_dma->tiny->next = NULL;
-    g_dma->tiny->size = 0;
-    g_dma->tiny->inuse = 0;
-
     g_dma->addr.tiny_start = (char*)g_dma->tiny;
 }
 
@@ -25,10 +22,16 @@ static void init_small(void)
     g_dma->small_limit = (size_t)S_LIMIT;
 
     g_dma->small->next = NULL;
-    g_dma->small->size = 0;
-    g_dma->small->inuse = 0;
-
     g_dma->addr.small_start = (char*)g_dma->small;
+}
+
+static void init_large(void)
+{
+    g_dma->large= (struct l_block*)(g_dma->tiny + 1);
+    g_dma->large->blck_limit= g_dma->large + 1;
+    g_dma->large->next = NULL;
+
+    g_dma->addr.large_start = g_dma->large;
 }
 
 void init_memory(void)
@@ -43,17 +46,16 @@ void init_memory(void)
 
 	  	init_tiny();
 		init_small();
+        init_large();
 		g_dma->get_tiny = push_tiny_chunk;
         g_dma->get_small = push_small_chunk;
-        //g_dma->get_large = add_large;
-       // g_dma->get_small = get_small;
-	} 
+        g_dma->get_large = push_large_chunk;
+    }
 	  //init_large();
 }
 
 int main(void)
 {
-  //   init_memory();
   char *ptr = mallok(20);
   mallok(21);
   mallok(24);
