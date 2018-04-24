@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <sys/mman.h>
 #include <pthread.h>
+#include <stdio.h>
 #include <errno.h>
 
 #define T_SIZE 2
@@ -22,7 +23,7 @@
 #define OFFSET -1
 #define HDR_OFFSET 1
 
-#define IN_PAGE(NODE, S) ((char *)NODE->next - (char *)NODE->blck_limit >= S)
+#define IN_PAGE(NODE, S) ((char *)NODE->next - (char *)NODE->blck_limit) < S
 
 /**
  * tiny_block

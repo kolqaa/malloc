@@ -9,7 +9,7 @@ long print_alloc(struct t_block *node)
     printf("%lx", (long)(node->blck_limit));
     printf(" : ");
     size = node->size;//(char*)node->blck_limit - (char*)node - sizeof(struct t_block);
-    printf("%ld ", size - sizeof(struct t_block));
+    printf("%ld ", size);
     puts(" octets\n");
     return (size);
 }
@@ -19,10 +19,10 @@ long print_malloc(struct t_block *node)
     long total;
 
     total = 0;
-    while (node->next != NULL)
+    while (node->next)
     {
-        node = node->next;
         total += print_alloc(node);
+        node = node->next;
     }
     return (total);
 }

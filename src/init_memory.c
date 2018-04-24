@@ -31,7 +31,7 @@ static void init_large(void)
     g_dma->large->blck_limit= g_dma->large + 1;
     g_dma->large->next = NULL;
 
-    g_dma->addr.large_start = g_dma->large;
+    g_dma->addr.large_start = (char *)g_dma->large;
 }
 
 void init_memory(void)
@@ -51,15 +51,16 @@ void init_memory(void)
         g_dma->get_small = push_small_chunk;
         g_dma->get_large = push_large_chunk;
     }
-	  //init_large();
 }
 
 int main(void)
 {
   char *ptr = mallok(20);
-  mallok(21);
-  mallok(24);
-  mallok(23);
-  show_alloc_mem();
+  char *ptr2 = mallok(21);
+  char *ptr3 = mallok(24);
+    show_alloc_mem();
+    char *ptr4 = mallok(23);
+    free(ptr);
+    show_alloc_mem();
   return 0;
 }

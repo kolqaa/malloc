@@ -9,7 +9,9 @@ void    *push_tiny_chunk(struct t_block *tiny_head, size_t size, size_t limit)
 
     tiny_node = tiny_head;
     while (tiny_node->next && IN_PAGE(tiny_node, size))
+    {
         tiny_node = tiny_node->next;
+    }
 
     if ((char*)tiny_node->blck_limit + size > (char*)tiny_head + limit)
         return NULL;
