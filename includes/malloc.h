@@ -9,12 +9,12 @@
 
 #define T_SIZE 2
 #define PREALOC_SIZE_TINY (getpagesize() * 100 * T_SIZE)
-#define T_PAGE_SIZE (2 * getpagesize()) // 32768
+#define T_PAGE_SIZE (2 * getpagesize())
 #define T_LIMIT (getpagesize() * 100 * T_SIZE)
 
 #define S_SIZE 16
 #define PREALOC_SIZE_SMALL (getpagesize() * 100 * S_SIZE)
-#define S_PAGE_SIZE (16 * getpagesize()) //131 078
+#define S_PAGE_SIZE (16 * getpagesize())
 #define S_LIMIT (getpagesize() * 100 * S_SIZE)
 
 

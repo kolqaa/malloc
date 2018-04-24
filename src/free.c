@@ -54,30 +54,56 @@ static void	free_small(struct s_block *small_head, void *ptr)
     }
 }
 
-void		free(void *ptr)
+int try_free_tiny(void *ptr)
 {
     void *addr;
 
-    pthread_mutex_lock(&mutex);
-    if (!ptr)
-    {
-        pthread_mutex_unlock(&mutex);
-        return ;
-    }
     addr = g_dma->tiny;
     if (addr < ptr && ptr < (addr + PREALOC_SIZE_TINY))
     {
         free_tiny(addr, ptr);
-        pthread_mutex_unlock(&mutex);
-        return ;
+        return 1;
     }
+
+    return 0;
+}
+
+int try_free_small(void *ptr)
+{
+    void *addr;
+
     addr = g_dma->small;
     if (addr < ptr && ptr < (addr + PREALOC_SIZE_SMALL))
     {
         free_small(addr, ptr);
+        return 1;
+    }
+
+    return 0;
+}
+
+
+void		free(void *ptr)
+{
+    pthread_mutex_lock(&mutex);
+    if (!ptr)
+    {
+        pthread_mutex_unlock(&mutex);
+        return;
+    }
+
+    if (try_free_tiny(ptr))
+    {
         pthread_mutex_unlock(&mutex);
         return ;
     }
+
+    if (try_free_small(ptr))
+    {
+        pthread_mutex_unlock(&mutex);
+        return ;
+    }
+
     free_large(ptr);
     pthread_mutex_unlock(&mutex);
 }

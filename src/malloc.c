@@ -1,5 +1,7 @@
 #include "../includes/malloc.h"
 
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+
 void *mallok(size_t size)
 {
     void *chunk;

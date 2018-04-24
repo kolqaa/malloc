@@ -3,7 +3,6 @@
 #include <stdlib.h>
 
 struct ovrl_block *g_dma = NULL;
-pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
 static void init_tiny(void)
 {
@@ -46,21 +45,26 @@ void init_memory(void)
 
 	  	init_tiny();
 		init_small();
-        init_large();
+        //init_large();
 		g_dma->get_tiny = push_tiny_chunk;
         g_dma->get_small = push_small_chunk;
-        g_dma->get_large = push_large_chunk;
+      //  g_dma->get_large = push_large_chunk;
     }
 }
 
 int main(void)
 {
+    show_alloc_mem();
   char *ptr = mallok(20);
   char *ptr2 = mallok(21);
   char *ptr3 = mallok(24);
     show_alloc_mem();
     char *ptr4 = mallok(23);
+    mallok(25);
+    char *test;
     free(ptr);
+    free(ptr2);
+    free(test);
     show_alloc_mem();
   return 0;
 }
