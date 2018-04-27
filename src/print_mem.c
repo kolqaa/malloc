@@ -19,9 +19,10 @@ long print_malloc(struct t_block *node)
     long total;
 
     total = 0;
+
     while (node->next)
     {
-        total += print_alloc(node);
+        total += print_alloc(node->next);
         node = node->next;
     }
     return (total);
