@@ -12,12 +12,12 @@ void *mallok(size_t size)
     if (g_dma == NULL)
         init_memory();
 
-    if (size <= (size_t)T_PAGE_SIZE)
-        chunk = g_dma->get_tiny(g_dma->tiny, size, g_dma->tiny_limit);
-    else if (size <= (size_t)S_PAGE_SIZE)
-        chunk = g_dma->get_small(g_dma->small, size, g_dma->small_limit);
+    if (size <= (size_t)TINY_MAX)
+        chunk = g_dma->get_block[TINY](g_dma->tiny, size, TINY_ZONE);
+    else if (size <= (size_t)SMALL_MAX)
+        chunk = g_dma->get_block[SMALL](g_dma->small, size, SMALL_ZONE);
     else
-        chunk = g_dma->get_large(size);
+        chunk = g_dma->get_block[LARGE](size);
 
     pthread_mutex_unlock(&mutex);
     return (chunk);

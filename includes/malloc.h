@@ -23,7 +23,24 @@
 #define OFFSET -1
 #define HDR_OFFSET 1
 
-#define IN_PAGE(NODE, S) ((char *)NODE->next - (char *)NODE->blck_limit) < S
+#define IN_PAGE(NODE, S) (((char *)NODE->next - (char *)NODE->blck_limit) < S)
+
+
+
+# define TINY_MAX getpagesize() / 4
+# define TINY_ZONE 100 * TINY_MAX
+
+# define SMALL_MAX getpagesize() * 16
+# define SMALL_ZONE 100 * SMALL_MAX
+
+#define BLOCK_TOTAL 3
+
+enum BLOCK_TYPE
+{
+    TINY,
+    SMALL,
+    LARGE
+};
 
 /**
  * tiny_block
@@ -86,9 +103,11 @@ struct ovrl_block
   	struct l_block *large;
   	struct block_addr addr;
 
-  	void *(*get_tiny)(struct t_block* , size_t, size_t);
-	void *(*get_small)(struct s_block* , size_t, size_t);
-    void *(*get_large)(size_t);
+  	//void *(*get_tiny)(struct t_block* , size_t, size_t);
+	//void *(*get_small)(struct s_block* , size_t, size_t);
+    //void *(*get_large)(size_t);
+    void *(*get_block[BLOCK_TOTAL])();
+    long (*print_block[BLOCK_TOTAL])();
 };
 
 
@@ -103,7 +122,12 @@ void *push_tiny_chunk(struct t_block *tiny_head, size_t size, size_t limit);
 void *push_small_chunk(struct s_block *small_head, size_t size, size_t limit);
 void *push_large_chunk(size_t size);
 void show_alloc_mem(void);
-long print_malloc(struct t_block *node);
-long print_alloc(struct t_block *node);
+//long print_malloc(struct t_block *node);
+//long print_alloc(struct t_block *node);
+long start_print_tiny(struct t_block *node);
+long start_print_small(struct s_block *node);
+long start_print_large(struct l_block *node);
+void *realloc(void *ptr, size_t size);
+void free(void *ptr);
 
 #endif
