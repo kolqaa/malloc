@@ -1,5 +1,15 @@
 #include "../includes/malloc.h"
-#include <string.h>
+
+void	*ft_memcpy(void *dest, const void *src, size_t n)
+{
+    char *tmp;
+
+    tmp = dest;
+    while (n--)
+        *tmp++ = *(unsigned char*)src++;
+    return (dest);
+}
+
 /**
  *  CAUTION! call it with mutex held,
  *  this function release it.
@@ -26,7 +36,7 @@ void	*realloc_tiny(struct t_block *tiny_head, void *ptr, size_t size)
                 size = (char *)tiny_node->next->blck_limit -
                        (char *)tiny_node->next;
 
-            memcpy(ptr, tiny_node->next + 1, size);
+            ft_memcpy(ptr, tiny_node->next + 1, size);
 
             pthread_mutex_unlock(&mutex);
             free(tiny_node->next);
@@ -66,7 +76,7 @@ void	*realloc_small(struct s_block *small_head, void *ptr, size_t size)
                 size = (char *)small_node->next->blck_limit -
                        (char *)small_node->next;
 
-            memcpy(ptr, small_node->next + 1, size);
+            ft_memcpy(ptr, small_node->next + 1, size);
 
             pthread_mutex_unlock(&mutex);
             free(small_node->next);
@@ -107,7 +117,7 @@ void	*realloc_large(struct l_block *large_head, void *ptr, size_t size)
                 size = (char *)large_node->next->blck_limit -
                        (char *)large_node->next;
 
-            memcpy(ptr, large_node->next + 1, size);
+            ft_memcpy(ptr, large_node->next + 1, size);
 
             pthread_mutex_unlock(&mutex);
             free(large_node->next);

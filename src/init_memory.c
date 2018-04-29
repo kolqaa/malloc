@@ -1,5 +1,4 @@
 #include "../includes/malloc.h"
-#include <stdio.h>
 #include <stdlib.h>
 
 struct ovrl_block *g_dma = NULL;
@@ -55,7 +54,7 @@ void init_memory(void)
     }
 }
 
-#include <string.h>
+/*#include <string.h>
 int main(void)
 {
     char *ptr = mallok(2);
@@ -74,4 +73,4 @@ int main(void)
     return 0;
 
   return 0;
-}
+}*/
