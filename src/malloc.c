@@ -12,10 +12,10 @@ void *mallok(size_t size)
     if (g_dma == NULL)
         init_memory();
 
-    if (size <= (size_t)TINY_MAX)
-        chunk = g_dma->get_block[TINY](g_dma->tiny, size, TINY_ZONE);
-    else if (size <= (size_t)SMALL_MAX)
-        chunk = g_dma->get_block[SMALL](g_dma->small, size, SMALL_ZONE);
+    if (size <= TINY_MAX)
+        chunk = g_dma->get_block[TINY](g_dma->tiny, size, g_dma->tiny_limit);
+    else if (size <= SMALL_MAX)
+        chunk = g_dma->get_block[SMALL](g_dma->small, size, g_dma->small_limit);
     else
         chunk = g_dma->get_block[LARGE](size);
 

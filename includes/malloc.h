@@ -7,16 +7,11 @@
 #include <stdio.h>
 #include <errno.h>
 
-#define T_SIZE 2
-#define PREALOC_SIZE_TINY (getpagesize() * 100 * T_SIZE)
-#define T_PAGE_SIZE (2 * getpagesize())
-#define T_LIMIT (getpagesize() * 100 * T_SIZE)
+#define TINY_MAX (size_t)(getpagesize() / 4)
+#define TINY_ZONE 100 * TINY_MAX
 
-#define S_SIZE 16
-#define PREALOC_SIZE_SMALL (getpagesize() * 100 * S_SIZE)
-#define S_PAGE_SIZE (16 * getpagesize())
-#define S_LIMIT (getpagesize() * 100 * S_SIZE)
-
+#define SMALL_MAX (size_t)(getpagesize() * 16)
+#define SMALL_ZONE 100 * SMALL_MAX
 
 #define HDR_SIZE (sizeof(struct ovrl_block))
 #define MMAP_FLAGS PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE
@@ -24,14 +19,6 @@
 #define HDR_OFFSET 1
 
 #define IN_PAGE(NODE, S) (((char *)NODE->next - (char *)NODE->blck_limit) < S)
-
-
-
-# define TINY_MAX getpagesize() / 4
-# define TINY_ZONE 100 * TINY_MAX
-
-# define SMALL_MAX getpagesize() * 16
-# define SMALL_ZONE 100 * SMALL_MAX
 
 #define BLOCK_TOTAL 3
 
@@ -103,31 +90,32 @@ struct ovrl_block
   	struct l_block *large;
   	struct block_addr addr;
 
-  	//void *(*get_tiny)(struct t_block* , size_t, size_t);
-	//void *(*get_small)(struct s_block* , size_t, size_t);
-    //void *(*get_large)(size_t);
     void *(*get_block[BLOCK_TOTAL])();
     long (*print_block[BLOCK_TOTAL])();
 };
 
-
-
-
 extern struct ovrl_block *g_dma;
 extern pthread_mutex_t mutex;
 
-void *mallok(size_t size);
 void init_memory(void);
+
+/* allocation function */
+void *mallok(size_t size);
 void *push_tiny_chunk(struct t_block *tiny_head, size_t size, size_t limit);
 void *push_small_chunk(struct s_block *small_head, size_t size, size_t limit);
 void *push_large_chunk(size_t size);
+
+/* memory printing function */
 void show_alloc_mem(void);
-//long print_malloc(struct t_block *node);
-//long print_alloc(struct t_block *node);
 long start_print_tiny(struct t_block *node);
 long start_print_small(struct s_block *node);
 long start_print_large(struct l_block *node);
-void *realloc(void *ptr, size_t size);
+
+/* block reallocation function */
+void    *realloc(void *ptr, size_t size);
+void	*realloc_tiny(struct t_block *tiny_head, void *ptr, size_t size);
+void	*realloc_small(struct s_block *small_head, void *ptr, size_t size);
+void	*realloc_large(struct l_block *large_head, void *ptr, size_t size);
 void free(void *ptr);
 
 #endif

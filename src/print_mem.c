@@ -1,19 +1,51 @@
 #include "../includes/malloc.h"
 
+void ft_putchar(char c)
+{
+    write(1, &c, 1);
+}
+
+void	ft_putnbr(int n)
+{
+    if (n >= 0)
+        n = -n;
+    else
+        ft_putchar('-');
+    if (n < -9)
+        ft_putnbr(-(n / 10));
+    ft_putchar(-(n % 10) + 48);
+}
+static void	print_hex(long hex, int prefix)
+{
+    int	i;
+    char c;
+
+    if (prefix)
+        write(1, "0x", 2);
+    if (hex >= 16)
+        print_hex(hex / 16, 0);
+    i = hex % 16;
+    if (i >= 10)
+        ft_putchar(i - 10 + 'a');
+    else
+        ft_putchar(i + '0');
+}
 
 long small_allocation_print(struct s_block *node)
 {
     long size;
 
     if (node == NULL)
-        return 12;
-    printf("%lx", (long)(node + 1));
-    printf(" - ");
-    printf("%lx", (long)(node->blck_limit));
-    printf(" : ");
+        return 0;
+
+    print_hex((long)(node + 1), 1);
+    write(1, " - ", 3);
+    print_hex((long)(node->blck_limit), 1);
+    write(1, " : ", 3);
     size = node->size;
-    printf("%ld ", size);
-    puts(" octets");
+    ft_putnbr(size);
+    write(1, " octets\n", 8);
+
     return (size);
 }
 
@@ -37,14 +69,16 @@ long large_allocation_print(struct l_block *node)
     long size;
 
     if (node == NULL)
-        return 12;
-    printf("%lx", (long)(node + 1));
-    printf(" - ");
-    printf("%lx", (long)(node->blck_limit));
-    printf(" : ");
+        return 0;
+
+    print_hex((long)(node + 1), 1);
+    write(1, " - ", 3);
+    print_hex((long)(node->blck_limit), 1);
+    write(1, " : ", 3);
     size = node->size;
-    printf("%ld ", size);
-    puts(" octets");
+    ft_putnbr(size);
+    write(1, " octets\n", 8);
+
     return (size);
 }
 
@@ -53,7 +87,6 @@ long start_print_large(struct l_block *node)
     long total;
 
     total = 0;
-
     while (node->next)
     {
         total += large_allocation_print(node->next);
@@ -67,14 +100,16 @@ long tiny_allocation_print(struct t_block *node)
     long size;
 
     if (node == NULL)
-        return 12;
-    printf("%lx", (long)(node + 1));
-    printf(" - ");
-    printf("%lx", (long)(node->blck_limit));
-    printf(" : ");
+        return 0;
+
+    print_hex((long)(node + 1), 1);
+    write(1, " - ", 3);
+    print_hex((long)(node->blck_limit), 1);
+    write(1, " : ", 3);
     size = node->size;
-    printf("%ld ", size);
-    puts(" octets");
+    ft_putnbr(size);
+    write(1, " octets\n", 8);
+
     return (size);
 }
 
@@ -94,21 +129,25 @@ long start_print_tiny(struct t_block *node)
 
 void show_alloc_mem(void)
 {
-    void *ptr;
     pthread_mutex_lock(&mutex);
     if (!g_dma)
     {
-        printf("Call show alloc_mem on unitialized dma\n");
+        write(1, "show mem error: Not initialized\n", 32);
         return;
     }
-    printf("TINY : %p\n", g_dma->tiny);
-    ptr = g_dma->tiny;
-    g_dma->print_block[TINY](ptr);
-    printf("SMALL : %p\n", g_dma->small);
-    ptr = g_dma->small;
-    g_dma->print_block[SMALL](ptr);
-    printf("LARGE : %p\n", g_dma->large);
-    ptr = g_dma->large;
-    g_dma->print_block[LARGE](ptr);
+    write(1, "TINY : ", 7);
+    print_hex((long)g_dma->tiny, 1);
+    write(1, "\n", 1);
+    g_dma->print_block[TINY](g_dma->tiny);
+
+    write(1, "SMALL : ", 8);
+    print_hex((long)g_dma->small, 1);
+    write(1, "\n", 1);
+    g_dma->print_block[SMALL](g_dma->small);
+
+    write(1, "LARGE : ", 8);
+    print_hex((long)g_dma->large, 1);
+    write(1, "\n", 1);
+    g_dma->print_block[LARGE](g_dma->large);
     pthread_mutex_unlock(&mutex);
 }
