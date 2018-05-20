@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   free.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: nsimonov <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2018/05/20 14:56:19 by nsimonov          #+#    #+#             */
+/*   Updated: 2018/05/20 14:59:26 by nsimonov         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/malloc.h"
 
 static void	free_large(void *ptr)
@@ -54,7 +66,7 @@ static void	free_small(struct s_block *small_head, void *ptr)
 	}
 }
 
-int try_free_tiny(void *ptr)
+int			try_free_tiny(void *ptr)
 {
 	void *addr;
 
@@ -62,13 +74,12 @@ int try_free_tiny(void *ptr)
 	if (addr < ptr && ptr < (addr + TINY_ZONE))
 	{
 		free_tiny(addr, ptr);
-		return 1;
+		return (1);
 	}
-
-	return 0;
+	return (0);
 }
 
-int try_free_small(void *ptr)
+int			try_free_small(void *ptr)
 {
 	void *addr;
 
@@ -76,12 +87,10 @@ int try_free_small(void *ptr)
 	if (addr < ptr && ptr < (addr + SMALL_ZONE))
 	{
 		free_small(addr, ptr);
-		return 1;
+		return (1);
 	}
-
-	return 0;
+	return (0);
 }
-
 
 void		free(void *ptr)
 {
@@ -89,21 +98,18 @@ void		free(void *ptr)
 	if (!ptr)
 	{
 		pthread_mutex_unlock(&mutex);
-		return;
+		return ;
 	}
-
 	if (try_free_tiny(ptr))
 	{
 		pthread_mutex_unlock(&mutex);
 		return ;
 	}
-
 	if (try_free_small(ptr))
 	{
 		pthread_mutex_unlock(&mutex);
 		return ;
 	}
-
 	free_large(ptr);
 	pthread_mutex_unlock(&mutex);
 }

@@ -1,11 +1,23 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   print_mem.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: nsimonov <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2018/05/20 14:59:36 by nsimonov          #+#    #+#             */
+/*   Updated: 2018/05/20 15:09:05 by nsimonov         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/malloc.h"
 
-void ft_putchar(char c)
+void		ft_putchar(char c)
 {
 	write(1, &c, 1);
 }
 
-void	ft_putnbr(int n)
+void		ft_putnbr(int n)
 {
 	if (n >= 0)
 		n = -n;
@@ -15,6 +27,7 @@ void	ft_putnbr(int n)
 		ft_putnbr(-(n / 10));
 	ft_putchar(-(n % 10) + 48);
 }
+
 static void	print_hex(long hex, int prefix)
 {
 	int	i;
@@ -30,13 +43,12 @@ static void	print_hex(long hex, int prefix)
 		ft_putchar(i + '0');
 }
 
-long small_allocation_print(struct s_block *node)
+long		small_allocation_print(struct s_block *node)
 {
 	long size;
 
 	if (node == NULL)
-		return 0;
-
+		return (0);
 	print_hex((long)(node + 1), 1);
 	write(1, " - ", 3);
 	print_hex((long)(node->blck_limit), 1);
@@ -44,16 +56,14 @@ long small_allocation_print(struct s_block *node)
 	size = node->size;
 	ft_putnbr(size);
 	write(1, " octets\n", 8);
-
 	return (size);
 }
 
-long start_print_small(struct s_block *node)
+long		start_print_small(struct s_block *node)
 {
 	long total;
 
 	total = 0;
-
 	while (node->next)
 	{
 		total += small_allocation_print(node->next);
@@ -62,14 +72,12 @@ long start_print_small(struct s_block *node)
 	return (total);
 }
 
-
-long large_allocation_print(struct l_block *node)
+long		large_allocation_print(struct l_block *node)
 {
 	long size;
 
 	if (node == NULL)
-		return 0;
-
+		return (0);
 	print_hex((long)(node + 1), 1);
 	write(1, " - ", 3);
 	print_hex((long)(node->blck_limit), 1);
@@ -77,11 +85,10 @@ long large_allocation_print(struct l_block *node)
 	size = node->size;
 	ft_putnbr(size);
 	write(1, " octets\n", 8);
-
 	return (size);
 }
 
-long start_print_large(struct l_block *node)
+long		start_print_large(struct l_block *node)
 {
 	long total;
 
@@ -94,13 +101,12 @@ long start_print_large(struct l_block *node)
 	return (total);
 }
 
-long tiny_allocation_print(struct t_block *node)
+long		tiny_allocation_print(struct t_block *node)
 {
 	long size;
 
 	if (node == NULL)
-		return 0;
-
+		return (0);
 	print_hex((long)(node + 1), 1);
 	write(1, " - ", 3);
 	print_hex((long)(node->blck_limit), 1);
@@ -108,16 +114,14 @@ long tiny_allocation_print(struct t_block *node)
 	size = node->size;
 	ft_putnbr(size);
 	write(1, " octets\n", 8);
-
 	return (size);
 }
 
-long start_print_tiny(struct t_block *node)
+long		start_print_tiny(struct t_block *node)
 {
 	long total;
 
 	total = 0;
-
 	while (node->next)
 	{
 		total += tiny_allocation_print(node->next);
@@ -126,24 +130,22 @@ long start_print_tiny(struct t_block *node)
 	return (total);
 }
 
-void show_alloc_mem(void)
+void		show_alloc_mem(void)
 {
 	pthread_mutex_lock(&mutex);
 	if (!g_dma)
 	{
 		write(1, "show mem error: Not initialized\n", 32);
-		return;
+		return ;
 	}
 	write(1, "TINY : ", 7);
 	print_hex((long)g_dma->tiny, 1);
 	write(1, "\n", 1);
 	g_dma->print_block[TINY](g_dma->tiny);
-
 	write(1, "SMALL : ", 8);
 	print_hex((long)g_dma->small, 1);
 	write(1, "\n", 1);
 	g_dma->print_block[SMALL](g_dma->small);
-
 	write(1, "LARGE : ", 8);
 	print_hex((long)g_dma->large, 1);
 	write(1, "\n", 1);
