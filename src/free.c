@@ -6,7 +6,7 @@
 /*   By: nsimonov <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/05/20 14:56:19 by nsimonov          #+#    #+#             */
-/*   Updated: 2018/05/20 14:59:26 by nsimonov         ###   ########.fr       */
+/*   Updated: 2018/05/27 15:56:26 by nsimonov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,26 +90,4 @@ int			try_free_small(void *ptr)
 		return (1);
 	}
 	return (0);
-}
-
-void		free(void *ptr)
-{
-	pthread_mutex_lock(&mutex);
-	if (!ptr)
-	{
-		pthread_mutex_unlock(&mutex);
-		return ;
-	}
-	if (try_free_tiny(ptr))
-	{
-		pthread_mutex_unlock(&mutex);
-		return ;
-	}
-	if (try_free_small(ptr))
-	{
-		pthread_mutex_unlock(&mutex);
-		return ;
-	}
-	free_large(ptr);
-	pthread_mutex_unlock(&mutex);
 }

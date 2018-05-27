@@ -1,3 +1,14 @@
+#******************************************************************************#
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    Makefile                                           :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: nsimonov <marvin@42.fr>                    +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2018/05/27 15:50:22 by nsimonov          #+#    #+#              #
+#    Updated: 2018/05/27 15:51:17 by nsimonov         ###   ########.fr        #
+#                                                                              #
+#******************************************************************************#
 
 # Check env
 ifeq ($(HOSTTYPE),)
@@ -25,7 +36,8 @@ FILES 	=	free			\
 		realloc			\
 		print_mem	\
 		chunck_manage \
-		block_reallocation
+		block_reallocation \
+		realloc_helper
 
 OBJ	:= 	$(addsuffix .o, $(FILES))
 
