@@ -6,7 +6,7 @@
 /*   By: nsimonov <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/05/20 14:51:36 by nsimonov          #+#    #+#             */
-/*   Updated: 2018/05/20 15:31:14 by nsimonov         ###   ########.fr       */
+/*   Updated: 2018/05/27 16:20:02 by nsimonov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,13 +28,13 @@ void				*realloc(void *ptr, size_t size)
 
 	if (!ptr || !size)
 		return (NULL);
-	pthread_mutex_lock(&mutex);
+	pthread_mutex_lock(&g_mutex);
 	if (is_tiny(g_dma->tiny, ptr))
 		new = realloc_tiny(g_dma->tiny, ptr, size);
 	else if (is_small(g_dma->small, ptr))
 		new = realloc_small(g_dma->small, ptr, size);
 	else
 		new = realloc_large(g_dma->large, ptr, size);
-	pthread_mutex_unlock(&mutex);
+	pthread_mutex_unlock(&g_mutex);
 	return (new);
 }

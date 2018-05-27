@@ -6,16 +6,16 @@
 /*   By: nsimonov <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/05/20 14:56:19 by nsimonov          #+#    #+#             */
-/*   Updated: 2018/05/27 15:56:26 by nsimonov         ###   ########.fr       */
+/*   Updated: 2018/05/27 16:09:55 by nsimonov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/malloc.h"
 
-static void	free_large(void *ptr)
+void	free_large(void *ptr)
 {
-	struct l_block *node;
-	struct l_block *tmp;
+	struct s_l_block *node;
+	struct s_l_block *tmp;
 
 	node = g_dma->large;
 	while (node->next)
@@ -34,9 +34,9 @@ static void	free_large(void *ptr)
 	}
 }
 
-static void	free_tiny(struct t_block *tiny_head, void *ptr)
+void	free_tiny(struct s_t_block *tiny_head, void *ptr)
 {
-	struct t_block *tiny_node;
+	struct s_t_block *tiny_node;
 
 	tiny_node = tiny_head;
 	while (tiny_node->next)
@@ -50,9 +50,9 @@ static void	free_tiny(struct t_block *tiny_head, void *ptr)
 	}
 }
 
-static void	free_small(struct s_block *small_head, void *ptr)
+void	free_small(struct s_s_block *small_head, void *ptr)
 {
-	struct s_block *small_node;
+	struct s_s_block *small_node;
 
 	small_node = small_head;
 	while (small_node->next)
@@ -66,7 +66,7 @@ static void	free_small(struct s_block *small_head, void *ptr)
 	}
 }
 
-int			try_free_tiny(void *ptr)
+int		try_free_tiny(void *ptr)
 {
 	void *addr;
 
@@ -79,7 +79,7 @@ int			try_free_tiny(void *ptr)
 	return (0);
 }
 
-int			try_free_small(void *ptr)
+int		try_free_small(void *ptr)
 {
 	void *addr;
 

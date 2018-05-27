@@ -1,4 +1,3 @@
-
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
@@ -7,7 +6,7 @@
 /*   By: nsimonov <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/05/20 14:59:36 by nsimonov          #+#    #+#             */
-/*   Updated: 2018/05/27 15:59:51 by nsimonov         ###   ########.fr       */
+/*   Updated: 2018/05/27 17:22:12 by nsimonov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +28,7 @@ void		ft_putnbr(int n)
 	ft_putchar(-(n % 10) + 48);
 }
 
-static void	print_hex(long hex, int prefix)
+void		print_hex(long hex, int prefix)
 {
 	int	i;
 
@@ -44,7 +43,7 @@ static void	print_hex(long hex, int prefix)
 		ft_putchar(i + '0');
 }
 
-long		start_print_tiny(struct t_block *node)
+long		start_print_tiny(struct s_t_block *node)
 {
 	long total;
 
@@ -59,7 +58,7 @@ long		start_print_tiny(struct t_block *node)
 
 void		show_alloc_mem(void)
 {
-	pthread_mutex_lock(&mutex);
+	pthread_mutex_lock(&g_mutex);
 	if (!g_dma)
 	{
 		write(1, "show mem error: Not initialized\n", 32);
@@ -77,5 +76,5 @@ void		show_alloc_mem(void)
 	print_hex((long)g_dma->large, 1);
 	write(1, "\n", 1);
 	g_dma->print_block[LARGE](g_dma->large);
-	pthread_mutex_unlock(&mutex);
+	pthread_mutex_unlock(&g_mutex);
 }

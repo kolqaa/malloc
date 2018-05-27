@@ -6,7 +6,7 @@
 /*   By: nsimonov <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/05/20 14:38:35 by nsimonov          #+#    #+#             */
-/*   Updated: 2018/05/20 15:55:02 by nsimonov         ###   ########.fr       */
+/*   Updated: 2018/05/27 16:18:40 by nsimonov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,11 @@ void	*malloc(size_t size)
 	chunk = NULL;
 	pthread_mutex_lock(&g_mutex);
 	if (g_dma == NULL)
+	{
 		init_memory();
+		if (g_dma == NULL)
+			return (NULL);
+	}
 	if (size <= TINY_MAX)
 		chunk = g_dma->get_block[TINY](g_dma->tiny, size, g_dma->tiny_limit);
 	else if (size <= SMALL_MAX)

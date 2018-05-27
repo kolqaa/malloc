@@ -1,3 +1,5 @@
+
+
 #******************************************************************************#
 #                                                                              #
 #                                                         :::      ::::::::    #
@@ -6,7 +8,7 @@
 #    By: nsimonov <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/05/27 15:50:22 by nsimonov          #+#    #+#              #
-#    Updated: 2018/05/27 15:51:17 by nsimonov         ###   ########.fr        #
+#    Updated: 2018/05/27 16:06:42 by nsimonov         ###   ########.fr        #
 #                                                                              #
 #******************************************************************************#
 
@@ -37,7 +39,8 @@ FILES 	=	free			\
 		print_mem	\
 		chunck_manage \
 		block_reallocation \
-		realloc_helper
+		realloc_help \
+		print_help
 
 OBJ	:= 	$(addsuffix .o, $(FILES))
 

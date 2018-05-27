@@ -22,9 +22,9 @@ void	*ft_memcpy(void *dest, const void *src, size_t n)
 	return (dest);
 }
 
-void	*realloc_tiny(struct t_block *tiny_head, void *ptr, size_t size)
+void	*realloc_tiny(struct s_t_block *tiny_head, void *ptr, size_t size)
 {
-	struct t_block	*tiny_node;
+	struct s_t_block	*tiny_node;
 
 	tiny_node = tiny_head;
 	while (tiny_node->next)
@@ -50,9 +50,9 @@ void	*realloc_tiny(struct t_block *tiny_head, void *ptr, size_t size)
 	return (NULL);
 }
 
-void	*realloc_small(struct s_block *small_head, void *ptr, size_t size)
+void	*realloc_small(struct s_s_block *small_head, void *ptr, size_t size)
 {
-	struct s_block	*small_node;
+	struct s_s_block	*small_node;
 
 	small_node = small_head;
 	while (small_node->next)
@@ -78,9 +78,9 @@ void	*realloc_small(struct s_block *small_head, void *ptr, size_t size)
 	return (NULL);
 }
 
-void	*realloc_large(struct l_block *large_head, void *ptr, size_t size)
+void	*realloc_large(struct s_l_block *large_head, void *ptr, size_t size)
 {
-	struct l_block	*large_node;
+	struct s_l_block	*large_node;
 
 	large_node = large_head;
 	while (large_node->next)
